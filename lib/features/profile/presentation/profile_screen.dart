@@ -49,8 +49,7 @@ class ProfileScreen extends ConsumerWidget {
                   max: (kTextScaleSteps.length - 1).toDouble(),
                   divisions: kTextScaleSteps.length - 1,
                   label: kTextScaleLabels[scaleIndex],
-                  semanticFormatterCallback: (v) =>
-                      kTextScaleLabels[v.round()],
+                  semanticFormatterCallback: (v) => kTextScaleLabels[v.round()],
                   onChanged: (v) => ref
                       .read(textScaleIndexProvider.notifier)
                       .state = v.round(),

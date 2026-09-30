@@ -7,6 +7,9 @@ class BibleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderScreen(title: 'Bible', note: 'Bible reader arrives in Phase 2.');
+    return const PlaceholderScreen(
+      title: 'Bible',
+      note: 'Bible reader arrives in Phase 2.',
+    );
   }
 }

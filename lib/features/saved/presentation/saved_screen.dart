@@ -7,6 +7,9 @@ class SavedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderScreen(title: 'Saved', note: 'Bookmarks, highlights and notes arrive in Phase 4.');
+    return const PlaceholderScreen(
+      title: 'Saved',
+      note: 'Bookmarks, highlights and notes arrive in Phase 4.',
+    );
   }
 }

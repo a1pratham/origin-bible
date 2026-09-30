@@ -7,6 +7,9 @@ class FeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderScreen(title: 'Daily Feed', note: 'Swipe feed arrives in Phase 6.');
+    return const PlaceholderScreen(
+      title: 'Daily Feed',
+      note: 'Swipe feed arrives in Phase 6.',
+    );
   }
 }

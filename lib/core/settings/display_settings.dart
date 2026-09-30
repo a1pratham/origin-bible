@@ -3,7 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// User-selectable text size steps, applied on top of the system font scale.
 const List<double> kTextScaleSteps = [0.85, 1.0, 1.15, 1.3, 1.5];
-const List<String> kTextScaleLabels = ['Small', 'Default', 'Large', 'XL', 'XXL'];
+const List<String> kTextScaleLabels = [
+  'Small',
+  'Default',
+  'Large',
+  'XL',
+  'XXL',
+];
 
 /// Combines the OS font scale with the in-app scale, within safe bounds.
 double effectiveTextScale({required double system, required double user}) {
