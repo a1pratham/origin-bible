@@ -9,3 +9,7 @@
 | 5 | Feed built on seed JSON first (Phase 6) | Proves "stored content is the source of truth" before any AI exists |
 | 6 | Drift (SQLite) added in Phase 2, not Phase 0 | Avoid unused dependencies until the schema is designed |
 | 7 | Config via --dart-define-from-file | No secrets in source; public values only in the app |
+| 8 | System fonts only in Phase 1 | No license risk, no download size; bundled reading font only after LICENSES.md entry |
+| 9 | Theme mode and text size held in memory | Persistence arrives with local storage in Phase 3 |
+| 10 | All animations via AppMotion.resolve | Respects the OS "remove animations" accessibility setting |
+| 11 | Sample reading text is not Scripture | No translation text enters the app before its license is approved |
