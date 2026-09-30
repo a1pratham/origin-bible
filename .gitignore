@@ -1,0 +1,17 @@
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+# Secrets - never commit
+env/dev.json
+env/prod.json
+*.jks
+*.keystore
+key.properties
+google-services.json
+GoogleService-Info.plist
+.env

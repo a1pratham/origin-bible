@@ -1,0 +1,6 @@
+{
+  "APP_ENV": "prod",
+  "SUPABASE_URL": "",
+  "SUPABASE_ANON_KEY": "",
+  "GENERATION_ENABLED": "false"
+}
