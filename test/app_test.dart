@@ -14,7 +14,8 @@ void main() {
 
     await tester.tap(find.text('Bible').last);
     await tester.pumpAndSettle();
-    expect(find.textContaining('Phase 2'), findsOneWidget);
+    // The book list comes from the built-in catalog, so it needs no database.
+    expect(find.text('Genesis'), findsOneWidget);
   });
 
   test('generation is disabled by default (fail-closed)', () {
