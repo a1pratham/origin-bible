@@ -9,10 +9,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Local reads only (no network). The store never throws and gives up after
-  // 2 seconds, falling back to defaults, so startup cannot hang.
+  // 2 seconds per read, falling back to defaults, so startup cannot hang.
   final store = SqliteUserDataStore();
   final preferences = await store.loadPreferences();
   final recents = await store.loadRecents();
+  final annotations = await store.loadAnnotations();
 
   runApp(
     ProviderScope(
@@ -20,6 +21,7 @@ Future<void> main() async {
         userDataStoreProvider.overrideWithValue(store),
         initialPreferencesProvider.overrideWithValue(preferences),
         initialRecentsProvider.overrideWithValue(recents),
+        initialAnnotationsProvider.overrideWithValue(annotations),
       ],
       child: const OriginBibleApp(),
     ),

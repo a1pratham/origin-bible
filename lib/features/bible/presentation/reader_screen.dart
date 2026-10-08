@@ -1,13 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/state_views.dart';
+import '../../annotations/application/annotations_provider.dart';
+import '../../annotations/presentation/verse_tile.dart';
 import '../application/bible_providers.dart';
 import '../application/recent_chapters.dart';
 import '../data/bible_books.dart';
 import '../data/translations.dart';
+
+/// A chapter counts as "read" after it has been on screen this long, so
+/// flipping quickly through chapters does not mark them.
+const Duration kReadDwell = Duration(seconds: 3);
 
 class ReaderScreen extends ConsumerStatefulWidget {
   const ReaderScreen({required this.code, required this.chapter, super.key});
@@ -22,6 +30,7 @@ class ReaderScreen extends ConsumerStatefulWidget {
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   late final PageController _controller;
   late int _current;
+  Timer? _readTimer;
 
   @override
   void initState() {
@@ -33,6 +42,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     if (book != null) {
       // Providers must not be modified while the tree is building.
       Future<void>.microtask(_recordCurrent);
+      _scheduleRead();
     }
   }
 
@@ -41,8 +51,18 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     ref.read(recentChaptersProvider.notifier).record(widget.code, _current);
   }
 
+  void _scheduleRead() {
+    _readTimer?.cancel();
+    final chapter = _current;
+    _readTimer = Timer(kReadDwell, () {
+      if (!mounted) return;
+      ref.read(annotationsProvider.notifier).markRead(widget.code, chapter);
+    });
+  }
+
   @override
   void dispose() {
+    _readTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -67,6 +87,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
         onPageChanged: (i) {
           setState(() => _current = i + 1);
           _recordCurrent();
+          _scheduleRead();
         },
         itemBuilder: (context, i) =>
             _ChapterPage(bookCode: book.code, chapter: i + 1),
@@ -109,29 +130,7 @@ class _ChapterPage extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.md),
                   children: [
                     for (final v in verses)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: Text.rich(
-                          TextSpan(
-                            children: [
-                              if (v.verse > 0)
-                                TextSpan(
-                                  text: '${v.verse} ',
-                                  style: reading.verseNumber,
-                                ),
-                              TextSpan(
-                                text: v.text,
-                                style: v.verse == 0
-                                    ? const TextStyle(
-                                        fontStyle: FontStyle.italic,
-                                      )
-                                    : null,
-                              ),
-                            ],
-                          ),
-                          style: reading.verse,
-                        ),
-                      ),
+                      VerseTile(verse: v, translation: translation),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
                       '${translation.name} (${translation.abbreviation}) · '

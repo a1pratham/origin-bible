@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../annotations/application/annotations_provider.dart';
 import '../application/bible_providers.dart';
 import '../application/recent_chapters.dart';
 import '../data/bible_books.dart';
@@ -20,6 +21,15 @@ class BibleScreen extends ConsumerWidget {
         .watch(recentChaptersProvider)
         .where((r) => bookByCode(r.bookCode) != null)
         .toList();
+
+    final readByBook = <String, int>{};
+    for (final id in ref.watch(
+      annotationsProvider.select((a) => a.readChapters),
+    )) {
+      final code = id.split(':').first;
+      readByBook[code] = (readByBook[code] ?? 0) + 1;
+    }
+
     final oldBooks =
         kBibleBooks.where((b) => b.testament == Testament.oldTestament);
     final newBooks =
@@ -71,9 +81,11 @@ class BibleScreen extends ConsumerWidget {
             ],
           ],
           const _SectionHeader('Old Testament'),
-          for (final b in oldBooks) _BookTile(book: b),
+          for (final b in oldBooks)
+            _BookTile(book: b, readCount: readByBook[b.code] ?? 0),
           const _SectionHeader('New Testament'),
-          for (final b in newBooks) _BookTile(book: b),
+          for (final b in newBooks)
+            _BookTile(book: b, readCount: readByBook[b.code] ?? 0),
           const SizedBox(height: AppSpacing.lg),
         ],
       ),
@@ -149,14 +161,18 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _BookTile extends StatelessWidget {
-  const _BookTile({required this.book});
+  const _BookTile({required this.book, required this.readCount});
 
   final BibleBook book;
+  final int readCount;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(book.name),
+      subtitle: readCount > 0
+          ? Text('$readCount of ${book.chapters} chapters read')
+          : null,
       trailing: const Icon(Icons.chevron_right),
       onTap: () => book.chapters == 1
           ? context.push('/bible/read/${book.code}/1')

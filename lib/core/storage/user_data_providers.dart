@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'annotation_models.dart';
 import 'user_data.dart';
 
 /// Defaults to in-memory so tests never touch the device database.
@@ -16,4 +17,8 @@ final initialPreferencesProvider = Provider<UserPreferences>(
 
 final initialRecentsProvider = Provider<List<RecentChapter>>(
   (ref) => const [],
+);
+
+final initialAnnotationsProvider = Provider<UserAnnotations>(
+  (ref) => const UserAnnotations(),
 );
