@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../storage/user_data_providers.dart';
+
 /// User-selectable text size steps, applied on top of the system font scale.
 const List<double> kTextScaleSteps = [0.85, 1.0, 1.15, 1.3, 1.5];
 const List<String> kTextScaleLabels = [
@@ -16,8 +18,16 @@ double effectiveTextScale({required double system, required double user}) {
   return (system * user).clamp(0.8, 2.4);
 }
 
-// Held in memory for now. Persistence to local storage arrives in Phase 3.
-final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
+// Initial values come from local storage; changes are saved from app.dart.
+final themeModeProvider = StateProvider<ThemeMode>(
+  (ref) => ref.read(initialPreferencesProvider).themeMode,
+);
 
 /// Index into [kTextScaleSteps]. Default is 1 (1.0x).
-final textScaleIndexProvider = StateProvider<int>((ref) => 1);
+final textScaleIndexProvider = StateProvider<int>(
+  (ref) => ref
+      .read(initialPreferencesProvider)
+      .textScaleIndex
+      .clamp(0, kTextScaleSteps.length - 1)
+      .toInt(),
+);

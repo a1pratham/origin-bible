@@ -5,6 +5,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/state_views.dart';
 import '../application/bible_providers.dart';
+import '../application/recent_chapters.dart';
 import '../data/bible_books.dart';
 import '../data/translations.dart';
 
@@ -29,6 +30,15 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     _current =
         book == null ? 1 : widget.chapter.clamp(1, book.chapters).toInt();
     _controller = PageController(initialPage: _current - 1);
+    if (book != null) {
+      // Providers must not be modified while the tree is building.
+      Future<void>.microtask(_recordCurrent);
+    }
+  }
+
+  void _recordCurrent() {
+    if (!mounted) return;
+    ref.read(recentChaptersProvider.notifier).record(widget.code, _current);
   }
 
   @override
@@ -54,7 +64,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       body: PageView.builder(
         controller: _controller,
         itemCount: book.chapters,
-        onPageChanged: (i) => setState(() => _current = i + 1),
+        onPageChanged: (i) {
+          setState(() => _current = i + 1);
+          _recordCurrent();
+        },
         itemBuilder: (context, i) =>
             _ChapterPage(bookCode: book.code, chapter: i + 1),
       ),

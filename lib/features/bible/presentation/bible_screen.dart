@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_card.dart';
 import '../application/bible_providers.dart';
+import '../application/recent_chapters.dart';
 import '../data/bible_books.dart';
 import '../data/translations.dart';
 import 'translation_picker.dart';
@@ -14,6 +16,10 @@ class BibleScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final translation = translationById(ref.watch(selectedTranslationProvider));
+    final recents = ref
+        .watch(recentChaptersProvider)
+        .where((r) => bookByCode(r.bookCode) != null)
+        .toList();
     final oldBooks =
         kBibleBooks.where((b) => b.testament == Testament.oldTestament);
     final newBooks =
@@ -37,11 +43,78 @@ class BibleScreen extends ConsumerWidget {
       ),
       body: ListView(
         children: [
+          if (recents.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.md,
+                0,
+              ),
+              child: _ContinueCard(
+                bookName: bookByCode(recents.first.bookCode)!.name,
+                chapter: recents.first.chapter,
+                onTap: () => context.push(
+                  '/bible/read/${recents.first.bookCode}/${recents.first.chapter}',
+                ),
+              ),
+            ),
+            if (recents.length > 1) ...[
+              const _SectionHeader('Recent'),
+              for (final r in recents.skip(1).take(4))
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: Text('${bookByCode(r.bookCode)!.name} ${r.chapter}'),
+                  onTap: () =>
+                      context.push('/bible/read/${r.bookCode}/${r.chapter}'),
+                ),
+            ],
+          ],
           const _SectionHeader('Old Testament'),
           for (final b in oldBooks) _BookTile(book: b),
           const _SectionHeader('New Testament'),
           for (final b in newBooks) _BookTile(book: b),
           const SizedBox(height: AppSpacing.lg),
+        ],
+      ),
+    );
+  }
+}
+
+class _ContinueCard extends StatelessWidget {
+  const _ContinueCard({
+    required this.bookName,
+    required this.chapter,
+    required this.onTap,
+  });
+
+  final String bookName;
+  final int chapter;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AppCard(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(
+            Icons.play_circle_outline,
+            size: 32,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Continue reading', style: theme.textTheme.titleMedium),
+                Text('$bookName $chapter', style: theme.textTheme.bodyMedium),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right),
         ],
       ),
     );
