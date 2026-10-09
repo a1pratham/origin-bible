@@ -15,6 +15,12 @@ class AnnotationsNotifier extends Notifier<UserAnnotations> {
 
   UserDataStore get _store => ref.read(userDataStoreProvider);
 
+  /// Re-reads everything from the device database (after a sync merged
+  /// changes from another device, or local data was removed).
+  Future<void> reload() async {
+    state = await _store.loadAnnotations();
+  }
+
   void toggleBookmark(VerseRef verse) {
     final bookmarks = Map<VerseRef, DateTime>.of(state.bookmarks);
     DateTime? at;

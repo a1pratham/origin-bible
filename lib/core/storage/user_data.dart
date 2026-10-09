@@ -48,6 +48,10 @@ abstract class UserDataStore {
   Future<void> setNote(VerseRef verse, Note? note);
 
   Future<void> markChapterRead(String bookCode, int chapter, DateTime at);
+
+  /// Permanently removes all bookmarks, highlights, notes and progress from
+  /// this device. Settings and recents are kept.
+  Future<void> clearAnnotations();
 }
 
 const int kMaxRecentChapters = 20;
@@ -126,5 +130,13 @@ class InMemoryUserDataStore implements UserDataStore {
     DateTime at,
   ) async {
     readChapters.add(chapterId(bookCode, chapter));
+  }
+
+  @override
+  Future<void> clearAnnotations() async {
+    bookmarks.clear();
+    highlights.clear();
+    notes.clear();
+    readChapters.clear();
   }
 }
